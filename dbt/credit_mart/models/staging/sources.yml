@@ -1,0 +1,12 @@
+version: 2
+sources:
+- name: credit_oltp
+  schema: credit_oltp
+  tables:
+    - name: loan_contract
+    - name: arrears_dpd_status
+    - name: repayment_payment
+    - name: repayment_schedule
+    - name: write_off_and_recovery
+    - name: collections_case
+      

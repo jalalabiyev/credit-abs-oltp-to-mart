@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_loan_contract
+    columns:
+      - name: loan_id
+        tests: [not_null, unique]
+
+  - name: stg_arrears_daily
+    columns:
+      - name: loan_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+              to: ref('stg_loan_contract')
+              field: loan_id
+      - name: as_of_date
+        tests: [not_null]
+
+  - name: stg_payments
+    columns:
+      - name: payment_id
+        tests: [not_null, unique]
+      - name: loan_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_loan_contract')
+              field: loan_id
