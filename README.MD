@@ -29,7 +29,7 @@ Synthetic credit OLTP → dbt analytics mart pipeline to compute ABS-like credit
 
 
 Application Table - Data Quality Audit (Deutsch)
-[ ] Frage 1: Chronologische Logik Problem: application_date (2016) < created_at (2026). 
+[ok ] Frage 1: Chronologische Logik Problem: application_date (2016) < created_at (2026). 
 select * from application  where created_at >application_date ;
 select count(*) as FUTURE_DATE from application where created_at >application_date ; (6000)
 Lösung: Realistische Zeitverzögerung implementieren. 
@@ -42,4 +42,31 @@ Lösung: Die Daten im Generator-Code auf das aktuelle Tagesdatum begrenzen.
 Lösung: Für jede Zeile einen unterschiedlichen (randomisierten) Zeitstempel erstellen.
 
 [ ] Frage 4: ID-Reihenfolge (ID Gaps) Problem: Prüfung auf Lücken in der Spalte application_id. Lösung: Überprüfung, ob der Spaltentyp "Sequence" oder "Identity" korrekt funktioniert.
+## Chronologische Datenlogik (Chronological Logic)
+
+Um die Datenrealität zu erhöhen, wurde eine spezifische Zeitlogik für die Tabellen `application` und `borrower` implementiert. 
+
+
+- Das Erstellungsdatum created_at muss immer **vor** dem offiziellen Antragsdatum application_dateliegen.
+- Es wurde ein zufälliger Zeitabstand von 3 bis 72 Stunden zwischen der Systemerfassung und dem formalen Antrag definiert.
+- Dies verhindert, dass synthetische Daten durch Standard-Datenbankwerte wie now() unrealistisch wirken.
+
+Code-Implementierung:
+
+python
+# Logik zur Generierung realistischer Zeitstempel
+for _ in range(cfg.n_applications):
+    # 1. Zufälliges Antragsdatum wählen
+    app_dt = fake.date_between_dates(date_start=cfg.start_date_min, date_end=cfg.start_date_max)
+    app_dt_full = datetime.combine(app_dt, time(random.randint(0, 23), random.randint(0, 59)))
+
+    # 2. Created_at berechnen (3 bis 72 Stunden vor application_date)
+    random_gap = random.randint(3, 72)
+    created_at = app_dt_full - timedelta(hours=random_gap)
+
+    rows.append((app_dt_full, created_at))
+
+
+
+
 
