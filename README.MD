@@ -67,7 +67,19 @@ for _ in range(cfg.n_applications):
 
     rows.append((app_dt_full, created_at))
 
+Datenvalidität und Zeitlogik (Borrower)
+Um eine realistische Testumgebung zu schaffen, wurde die Erstellung der Kundendaten (created_at) logisch an den Zeitpunkt der Kreditanträge angepasst. Die Verteilung erfolgt nach einer 50/50-Regel, bei der die Hälfte der Nutzer als langjährige Bestandskunden (1–3 Jahre vor Antrag) und die andere Hälfte als Neukunden (1–5 Stunden vor Antrag) simuliert wird. Dies garantiert die Datenintegrität, da kein Kunde einen Antrag stellen kann, bevor er im System registriert ist.
 
+Logik-Auszug:
+
+Python
+
+if random.random() < 0.5:
+    # Neukunden (Stunden-Differenz)
+    b_created_at = ref_dt - timedelta(hours=random.randint(1, 5))
+else:
+    # Bestandskunden (Jahre-Differenz)
+    b_created_at = ref_dt - timedelta(days=random.randint(365, 1095))
 
 
 
