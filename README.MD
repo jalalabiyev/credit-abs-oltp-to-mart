@@ -28,7 +28,8 @@ Synthetic credit OLTP → dbt analytics mart pipeline to compute ABS-like credit
 
 
 
-Application Table - Data Quality Audit (Deutsch)
+## Application Table - Data Quality Audit (Deutsch)
+
 [ok ] Frage 1: Chronologische Logik Problem: application_date (2016) < created_at (2026). 
 select * from application  where created_at >application_date ;
 select count(*) as FUTURE_DATE from application where created_at >application_date ; (6000)
