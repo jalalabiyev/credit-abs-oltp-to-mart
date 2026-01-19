@@ -26,3 +26,20 @@ Synthetic credit OLTP → dbt analytics mart pipeline to compute ABS-like credit
 - Cure rate: delinquent → performing recovery rate
 - Vintage / MOB: cohort delinquency performance by origination month
 
+
+
+Application Table - Data Quality Audit (Deutsch)
+[ ] Frage 1: Chronologische Logik Problem: application_date (2016) < created_at (2026). 
+select * from application  where created_at >application_date ;
+select count(*) as FUTURE_DATE from application where created_at >application_date ; (6000)
+Lösung: Realistische Zeitverzögerung implementieren. 
+created_at wird zufällig zwischen 3 Stunden (für Bestandskunden) und 72 Stunden (maximale Bearbeitungszeit) nach dem application_date gesetzt.
+
+[ ] Frage 2: Prüfung auf zukünftige Daten Problem: Zeilen, in denen application_date > CURRENT_DATE ist. 
+Lösung: Die Daten im Generator-Code auf das aktuelle Tagesdatum begrenzen.
+
+[ ] Frage 3: Batch-Insert Duplikate Problem: Alle created_at Werte liegen in der gleichen Sekunde. 
+Lösung: Für jede Zeile einen unterschiedlichen (randomisierten) Zeitstempel erstellen.
+
+[ ] Frage 4: ID-Reihenfolge (ID Gaps) Problem: Prüfung auf Lücken in der Spalte application_id. Lösung: Überprüfung, ob der Spaltentyp "Sequence" oder "Identity" korrekt funktioniert.
+
